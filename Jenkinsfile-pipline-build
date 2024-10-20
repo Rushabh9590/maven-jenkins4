@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Apache Maven 3.9.9'
+        jdk 'java17' 
+    }
+    stages {
+        stage('Download-Code-Git') {
+            steps {
+                echo "Download Code from git"
+                git branch: 'main', url: 'https://github.com/Rushabh9590/maven-jenkins4'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Build Java Project using Mavan"
+                sh 'mvn clean package'
+            }
+        }
+        stage('Archive-Artifact') {
+            steps {
+               echo "Archiving thr artifacts." 
+               archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+            }
+        }
+        stage('Autostart-Deploy-job') {
+            steps {
+               echo "Deply Job triger." 
+               build wait: false, job: 'Pipeline-deploy'
+            }
+        }        
+    }
+}
